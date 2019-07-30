@@ -251,6 +251,12 @@ def start_timer(label):
 root = Tk()
 root.title('2048')
 
+#stopwatch
+counter = 0
+running = False
+
+table = starting_table()
+
 cell_1 = StringVar()
 cell_2 = StringVar()
 cell_3 = StringVar()
@@ -267,6 +273,8 @@ cell_13 = StringVar()
 cell_14 = StringVar()
 cell_15 = StringVar()
 cell_16 = StringVar()
+
+update_GUI_cells()
 
 #the main frame
 mainframe = ttk.Frame(root, width=1500, height=600, padding=10)
@@ -415,20 +423,9 @@ ttk.Button(controls_row5, text='Restart', command=restart_game).grid(row=0, colu
 ttk.Button(controls_row6, text='Quit', command=quit_game).grid(row=0, column=0, sticky='N,W,S,E')
 
 #StopWatch
-start_timer_button = ttk.Button(controls_row4_col0, text='Start timer', width=15, command=lambda:start_timer(label)) 
 label = ttk.Label(controls_row4_col2, text='Welcome', foreground='black', font='Verdana 12 bold') 
-label.pack()
-
-counter = 0
-running = False
-
-table = starting_table()
-start_timer_button.pack()
-
-
-
-
-update_GUI_cells()
+label.grid(row=0, column=0, sticky='N,W,S,E')
+ttk.Button(controls_row4_col0, text='Start timer', width=15, command=lambda:start_timer(label)).grid(row=0, column=0, sticky='N,W,S,E')
 
 
 #event handling for control control board
