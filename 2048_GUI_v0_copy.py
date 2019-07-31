@@ -1,10 +1,10 @@
 from tkinter import *
 from tkinter import ttk
+from tkinter import messagebox
 from random import randint
 from copy import deepcopy
 import sys
 import os
-from tkinter import messagebox
 
 
 def starting_table():
@@ -25,6 +25,7 @@ def starting_table():
         table[starting_coordinates_2[0]][starting_coordinates_2[1]] = 4   
     return table
 
+
 def zero_search(table):
     zero_coordinates = []
     for i in range(len(table)):
@@ -35,8 +36,8 @@ def zero_search(table):
 
 
 def status_check(table):
-    copy_table= [sorted(row,reverse = True) for row in table]
-    if max(max(copy_table)) < 2048:
+    copy_table = [sorted(row, reverse=True) for row in table]
+    if max(max(copy_table)) < 16:
         if zero_search(table) != []:
             status = "New round"
         elif addable(table):
@@ -44,8 +45,9 @@ def status_check(table):
         else:
             status = "End game"
     else:
-       status = "You win"
+        status = "You win"
     return status
+
 
 def addable(table):
     equals = []
@@ -62,10 +64,12 @@ def addable(table):
                     equals.append([i,j])
     return True if equals != [] else False
 
+
 def remove_all(what, from_where):
     for nested_list in from_where:
         while what in nested_list:
             nested_list.remove(what)
+
 
 def slide_right(table):
     remove_all(0,table)
@@ -101,6 +105,7 @@ def slide_right(table):
             table[i].insert(0,0)    
     return table
 
+
 def slide_left(table):
     remove_all(0,table)
     for i in range(4):
@@ -135,8 +140,10 @@ def slide_left(table):
             table[i].append(0)
     return table
 
+
 def rotate(table):
     return [list(row) for row in zip(*table)]
+
 
 def slide_up(table):
     table = rotate(table)
@@ -145,11 +152,13 @@ def slide_up(table):
     print(table)
     return table
 
+
 def slide_down(table):
     table = rotate(table)
     slide_right(table)
     table = rotate(table)
     return table
+
 
 def insert_number(table):
     zero_coordinates = zero_search(table)
@@ -162,13 +171,6 @@ def insert_number(table):
         table[i_coordinate][j_coordinate] = 2
     return table
 
-def new_game(start):
-    if input("New game? (y/n)") is "y":
-        start = "New game"
-    else:
-        start = "End game"
-    return start
-
 
 # GUI functions:
 
@@ -176,7 +178,7 @@ def update_GUI_cells():
     if table[0][0] != 0:
         cell_1.set(table[0][0])
     else:
-        cell_1.set('  ')
+        cell_1.set('')
     if table[0][1] != 0:
         cell_2.set(table[0][1])
     else:
@@ -238,6 +240,7 @@ def update_GUI_cells():
     else:
         cell_16.set('  ')
 
+
 def callback(event):
 
     global table, status
@@ -254,53 +257,67 @@ def callback(event):
             table = slide_right(table)
         elif event.keysym == 'Left':
             table = slide_left(table)
-        
+
         if prev_table != table:
             insert_number(table)
-        update_GUI_cells()   
+
+        update_GUI_cells()
+
         if status_check(table) != "New round":
             status = status_check(table)
+
             if status == 'You win':
-                #messagebox.askretrycancel("2048 message","You win!")
                 popupmsg('You win!')
             else:
-                #messagebox.askretrycancel("2048 message","You lose!")
                 popupmsg('You lose!')
-        #print(status)
-    
-    
-    update_GUI_cells()
+
 
 def popupmsg(msg):
-    popup = Tk()
-    popup.wm_title("!")
-    label = ttk.Label(popup, text=msg)
-    label.pack(side="top", fill="x", pady=10)
-    B1 = ttk.Button(popup, text="Restart", command = restart_game)
-    B1.pack()
-    B2 = ttk.Button(popup, text="Quit", command = combine_funcs(root.destroy, popup.destroy))
-    B2.pack()
-    popup.mainloop()
+    popup_root = Tk()
+    popup_root.wm_title('2048 message')
+    popup_root.resizable(False, False)
+    popup_mainframe = Frame(popup_root, bg='#351f36')
+    popup_mainframe.grid()
+    popup_row_1 = Frame(popup_mainframe)
+    popup_row_1.grid(row=0, column=0)
+    popup_row_2 = Frame(popup_mainframe, bg='#351f36')
+    popup_row_2.grid(row=1, column=0)
+    label = ttk.Label(popup_row_1, text=msg, padding=20, background='#351f36', foreground='#ccc497', font=("Arial", 35))
+    label.grid()
+    B1 = Button(popup_row_2, text='Restart', command=restart_game, bg='#363740', fg='#ccc497', font=("Arial", 15))
+    B1.grid(row=0, column=1)
+    B2 = Button(popup_row_2, text='Quit', command=combine_funcs(root.destroy, popup_root.destroy), bg='#363740', fg='#ccc497', font=("Arial", 15))
+    B2.grid(row=0, column=2)
+    popup_root.mainloop()
 
-"""def quit_game():
-    root.destroy()"""
 
 def combine_funcs(*funcs):
     def combined_func(*args, **kwargs):
         for f in funcs:
             f(*args, **kwargs)
-    return combined_func 
+    return combined_func
 
 
 def restart_game():
     python = sys.executable
     os.execl(python, python, * sys.argv)
 
+
 table = starting_table()
 status = "New round"
 
+
+# ----------   GUI   ----------
+
+
+# initialize GUI:
+
 root = Tk()
 root.title('2048')
+root.resizable(False, False)
+
+
+# initialize GUI variables:
 
 cell_1 = StringVar()
 cell_2 = StringVar()
@@ -321,157 +338,149 @@ cell_16 = StringVar()
 
 update_GUI_cells()
 
-# frame styles
+
+# frame styles:
 
 gui_style = ttk.Style()
 gui_style.configure('TButton', foreground='#334353')
 gui_style.configure('outer.TFrame', background='#363740')
-gui_style.configure('cell.TFrame', background='#351f36')
-gui_style.configure('TLabel', background='#351f36', foreground='#ccc497')
+gui_style.configure('cell.TFrame', background='#351f36', relief='raised')
+gui_style.configure('TLabel', background='#351f36', foreground='#ccc497', font=("Arial", 35))
 
-#the main frame
+
+# main frame:
+
 mainframe = ttk.Frame(root, width=1500, height=600, padding=10, style='outer.TFrame')
 mainframe.grid()
 
-#the game board occupying the left side of the main frame
+
+# game board frame inside main frame:
 
 game_board = ttk.Frame(mainframe, width=1200, height=600, relief='raised')
 game_board.grid(row=0, column=0)
 
-#the individual frames of the game board
 
-frame_1 = ttk.Frame(game_board, padding=50, relief='raised', style='cell.TFrame')
-frame_1.grid(row=0, column=0, sticky='N,W,S,E')
-frame_1.configure(height=100,width=100)
-frame_1.grid_propagate(0)
+# game board individual frames:
 
-frame_2 = ttk.Frame(game_board, padding=50, relief='raised', style='cell.TFrame')
-frame_2.grid(row=0, column=1, sticky='N,W,S,E')
-frame_2.configure(height=100,width=100)
-frame_2.grid_propagate(0)
+frame_1 = ttk.Frame(game_board, style='cell.TFrame')
+frame_1.grid(row=0, column=0)
+frame_1.configure(height=100, width=100, padding=50)
 
-frame_3 = ttk.Frame(game_board, padding=50, relief='raised', style='cell.TFrame')
-frame_3.grid(row=0, column=2, sticky='N,W,S,E')
-frame_3.configure(height=100,width=100)
-frame_3.grid_propagate(0)
+frame_2 = ttk.Frame(game_board, style='cell.TFrame')
+frame_2.grid(row=0, column=1)
+frame_2.configure(height=100, width=100, padding=50)
 
-frame_4 = ttk.Frame(game_board, padding=50, relief='raised', style='cell.TFrame')
-frame_4.grid(row=0, column=3, sticky='N,W,S,E')
-frame_4.configure(height=100,width=100)
-frame_4.grid_propagate(0)
+frame_3 = ttk.Frame(game_board, style='cell.TFrame')
+frame_3.grid(row=0, column=2)
+frame_3.configure(height=100, width=100, padding=50)
 
-frame_5 = ttk.Frame(game_board, padding=50, relief='raised', style='cell.TFrame')
-frame_5.grid(row=1, column=0, sticky='N,W,S,E')
-frame_5.configure(height=100,width=100)
-frame_5.grid_propagate(0)
+frame_4 = ttk.Frame(game_board, style='cell.TFrame')
+frame_4.grid(row=0, column=3)
+frame_4.configure(height=100, width=100, padding=50)
 
-frame_6 = ttk.Frame(game_board, padding=50, relief='raised', style='cell.TFrame')
-frame_6.grid(row=1, column=1, sticky='N,W,S,E')
-frame_6.configure(height=100,width=100)
-frame_6.grid_propagate(0)
+frame_5 = ttk.Frame(game_board, style='cell.TFrame')
+frame_5.grid(row=1, column=0)
+frame_5.configure(height=100, width=100, padding=50)
 
-frame_7 = ttk.Frame(game_board, padding=50, relief='raised', style='cell.TFrame')
-frame_7.grid(row=1, column=2, sticky='N,W,S,E')
-frame_7.configure(height=100,width=100)
-frame_7.grid_propagate(0)
+frame_6 = ttk.Frame(game_board, style='cell.TFrame')
+frame_6.grid(row=1, column=1)
+frame_6.configure(height=100, width=100, padding=50)
 
-frame_8 = ttk.Frame(game_board, padding=50, relief='raised', style='cell.TFrame')
-frame_8.grid(row=1, column=3, sticky='N,W,S,E')
-frame_8.configure(height=100,width=100)
-frame_8.grid_propagate(0)
+frame_7 = ttk.Frame(game_board, style='cell.TFrame')
+frame_7.grid(row=1, column=2)
+frame_7.configure(height=100, width=100, padding=50)
 
-frame_9 = ttk.Frame(game_board, padding=50, relief='raised', style='cell.TFrame')
-frame_9.grid(row=2, column=0, sticky='N,W,S,E')
-frame_9.configure(height=100,width=100)
-frame_9.grid_propagate(0)
+frame_8 = ttk.Frame(game_board, style='cell.TFrame')
+frame_8.grid(row=1, column=3)
+frame_8.configure(height=100, width=100, padding=50)
 
-frame_10 = ttk.Frame(game_board, padding=50, relief='raised', style='cell.TFrame')
-frame_10.grid(row=2, column=1, sticky='N,W,S,E')
-frame_10.configure(height=100,width=100)
-frame_10.grid_propagate(0)
+frame_9 = ttk.Frame(game_board, style='cell.TFrame')
+frame_9.grid(row=2, column=0)
+frame_9.configure(height=100, width=100, padding=50)
 
-frame_11 = ttk.Frame(game_board, padding=50, relief='raised', style='cell.TFrame')
-frame_11.grid(row=2, column=2, sticky='N,W,S,E')
-frame_11.configure(height=100,width=100)
-frame_11.grid_propagate(0)
+frame_10 = ttk.Frame(game_board, style='cell.TFrame')
+frame_10.grid(row=2, column=1)
+frame_10.configure(height=100, width=100, padding=50)
 
-frame_12 = ttk.Frame(game_board, padding=50, relief='raised', style='cell.TFrame')
-frame_12.grid(row=2, column=3, sticky='N,W,S,E')
-frame_12.configure(height=100,width=100)
-frame_12.grid_propagate(0)
+frame_11 = ttk.Frame(game_board, style='cell.TFrame')
+frame_11.grid(row=2, column=2)
+frame_11.configure(height=100, width=100, padding=50)
 
-frame_13 = ttk.Frame(game_board, padding=50, relief='raised', style='cell.TFrame')
-frame_13.grid(row=3, column=0, sticky='N,W,S,E')
-frame_13.configure(height=100,width=100)
-frame_13.grid_propagate(0)
+frame_12 = ttk.Frame(game_board, style='cell.TFrame')
+frame_12.grid(row=2, column=3)
+frame_12.configure(height=100, width=100, padding=50)
 
-frame_14 = ttk.Frame(game_board, padding=50, relief='raised', style='cell.TFrame')
-frame_14.grid(row=3, column=1, sticky='N,W,S,E')
-frame_14.configure(height=100,width=100)
-frame_14.grid_propagate(0)
+frame_13 = ttk.Frame(game_board, style='cell.TFrame')
+frame_13.grid(row=3, column=0)
+frame_13.configure(height=100, width=100, padding=50)
 
-frame_15 = ttk.Frame(game_board, padding=50, relief='raised', style='cell.TFrame')
-frame_15.grid(row=3, column=2, sticky='N,W,S,E')
-frame_15.configure(height=100,width=100)
-frame_15.grid_propagate(0)
+frame_14 = ttk.Frame(game_board, style='cell.TFrame')
+frame_14.grid(row=3, column=1)
+frame_14.configure(height=100, width=100, padding=50)
 
-frame_16 = ttk.Frame(game_board, padding=50, relief='raised', style='cell.TFrame')
-frame_16.grid(row=3, column=3, sticky='N,W,S,E')
-frame_16.configure(height=100,width=100)
-frame_16.grid_propagate(0)
+frame_15 = ttk.Frame(game_board, style='cell.TFrame')
+frame_15.grid(row=3, column=2)
+frame_15.configure(height=100, width=100, padding=50)
 
-#labels for frames on game board
+frame_16 = ttk.Frame(game_board, style='cell.TFrame')
+frame_16.grid(row=3, column=3)
+frame_16.configure(height=100, width=100, padding=50)
+
+
+# labels for frames on game board:
+
 label_frame_1 = ttk.Label(frame_1, textvariable=cell_1, style='TLabel')
 label_frame_1.place(anchor="center")
-label_frame_1.config(font=("Arial", 35))
+
 label_frame_2 = ttk.Label(frame_2, textvariable=cell_2, style='TLabel')
 label_frame_2.place(anchor="center")
-label_frame_2.config(font=("Arial", 35))
+
 label_frame_3 = ttk.Label(frame_3, textvariable=cell_3, style='TLabel')
 label_frame_3.place(anchor="center")
-label_frame_3.config(font=("Arial", 35))
+
 label_frame_4 = ttk.Label(frame_4, textvariable=cell_4, style='TLabel')
 label_frame_4.place(anchor="center")
-label_frame_4.config(font=("Arial", 35))
+
 label_frame_5 = ttk.Label(frame_5, textvariable=cell_5, style='TLabel')
 label_frame_5.place(anchor="center")
-label_frame_5.config(font=("Arial", 35))
+
 label_frame_6 = ttk.Label(frame_6, textvariable=cell_6, style='TLabel')
 label_frame_6.place(anchor="center")
-label_frame_6.config(font=("Arial", 35))
+
 label_frame_7 = ttk.Label(frame_7, textvariable=cell_7, style='TLabel')
 label_frame_7.place(anchor="center")
-label_frame_7.config(font=("Arial", 35))
+
 label_frame_8 = ttk.Label(frame_8, textvariable=cell_8, style='TLabel')
 label_frame_8.place(anchor="center")
-label_frame_8.config(font=("Arial", 35))
+
 label_frame_9 = ttk.Label(frame_9, textvariable=cell_9, style='TLabel')
 label_frame_9.place(anchor="center")
-label_frame_9.config(font=("Arial", 35))
+
 label_frame_10 = ttk.Label(frame_10, textvariable=cell_10, style='TLabel')
 label_frame_10.place(anchor="center")
-label_frame_10.config(font=("Arial", 35))
+
 label_frame_11 = ttk.Label(frame_11, textvariable=cell_11, style='TLabel')
 label_frame_11.place(anchor="center")
-label_frame_11.config(font=("Arial", 35))
+
 label_frame_12 = ttk.Label(frame_12, textvariable=cell_12, style='TLabel')
 label_frame_12.place(anchor="center")
-label_frame_12.config(font=("Arial", 35))
+
 label_frame_13 = ttk.Label(frame_13, textvariable=cell_13, style='TLabel')
 label_frame_13.place(anchor="center")
-label_frame_13.config(font=("Arial", 35))
+
 label_frame_14 = ttk.Label(frame_14, textvariable=cell_14, style='TLabel')
 label_frame_14.place(anchor="center")
-label_frame_14.config(font=("Arial", 35))
+
 label_frame_15 = ttk.Label(frame_15, textvariable=cell_15, style='TLabel')
 label_frame_15.place(anchor="center")
-label_frame_15.config(font=("Arial", 35))
+
 label_frame_16 = ttk.Label(frame_16, textvariable=cell_16, style='TLabel')
 label_frame_16.place(anchor="center")
-label_frame_16.config(font=("Arial", 35))
 
-#event handling for control control board
+# event handling:
+
 root.bind('<Key>', callback)
 
+# mainloop:
 
 root.mainloop()
