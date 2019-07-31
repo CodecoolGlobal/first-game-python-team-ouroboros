@@ -267,7 +267,7 @@ def callback(event):
             else:
                 #messagebox.askretrycancel("2048 message","You lose!")
                 popupmsg('You lose!')
-        #print(status)
+
     
     
     update_GUI_cells()
