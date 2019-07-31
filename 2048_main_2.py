@@ -69,7 +69,7 @@ def remove_zeros(table):
 
 def slide_right(table):
     remove_zeros(table)
-    score = 0
+    global score
     for rows in table:
         if len(rows) == 2:
             if rows[-1] == rows[-2]:
@@ -143,12 +143,27 @@ def insert_number(table):
 
 
 def table_print():
-    # print("\033c", end="")
-    print("""moves: 'w'= up / 's'= down / 'a'=left / 'd'=right
-    or enter 'x' to exit """)
+    print("\033c", end="")
+    table_to_print = copy.deepcopy(table)
     for i in range(4):
-        print(table[i])
+        for j in range(4):
+            if table_to_print[i][j] == 0:
+                table_to_print[i][j] = ""
     print()
+    print("THE 2048 GAME".center(33))
+    print()
+    print(f"Your score: {score}")
+    print("-" * 33)
+    for i in range(4):
+        print("|" + ("".center(7) + "|") * 4)
+        print("|" + str(table_to_print[i][0]).center(7) + "|" + str(table_to_print[i][1]).center(7) + "|"
+              + str(table_to_print[i][2]).center(7) + "|" + str(table_to_print[i][3]).center(7) + "|")
+        print("|" + ("".center(7) + "|") * 4)
+        print("-" * 33)
+    print()
+    print("""moves: 'w'= up / 's'= down /
+       'a'=left / 'd'=right
+       or enter 'x' to exit """)
 
 
 def user_input():
@@ -178,6 +193,7 @@ def new_game(start):
 
 start = "New game"
 while start == "New game":
+    score = 0
     status = "New round"
     table = starting_table()
     table_print()
@@ -188,7 +204,7 @@ while start == "New game":
         if y == "w":
             table = slide_up(table)
         elif y == "s":
-            table = slide_down(table, score)[0]
+            table = slide_down(table)
         elif y == "a":
             table = slide_left(table)
         elif y == "d":
