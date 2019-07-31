@@ -314,17 +314,17 @@ def timer(time):
             time.after(1000, count)  
             counter += 1
             if counter < 10: 
-                digital_timer = f'00:0{counter % 15}'
+                digital_timer = f'00:0{counter % 60}'
             else:
-                if (counter // 15 < 10) and (counter % 15 < 10): 
-                    digital_timer = f'0{counter // 15}:0{counter % 15}'
-                elif (counter // 15 < 10) and (counter % 15 >= 10):               
-                    digital_timer = f'0{counter // 15}:{counter % 15}'
+                if (counter // 60 < 10) and (counter % 60 < 10): 
+                    digital_timer = f'0{counter // 60}:0{counter % 60}'
+                elif (counter // 60 < 10) and (counter % 60 >= 10):               
+                    digital_timer = f'0{counter // 60}:{counter % 60}'
                 else:
-                    if counter % 15 < 10:
-                        digital_timer = f'{counter // 15}:0{counter % 15}'
+                    if counter % 60 < 10:
+                        digital_timer = f'{counter // 60}:0{counter % 60}'
                     else:
-                        digital_timer = f'{counter // 15}:{counter % 15}'
+                        digital_timer = f'{counter // 60}:{counter % 60}'
 
 
             #To update the timer continously
