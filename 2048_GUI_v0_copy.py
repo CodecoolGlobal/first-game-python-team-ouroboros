@@ -121,11 +121,13 @@ def slide_left(table):
 def transpose(table):
     return [list(row) for row in zip(*table)]
 
+
 def reverse_rows(table):
     return [list(reversed(row)) for row in table]
 
+
 def slide_up(table):
-    return transpose(slide_left(table))
+    return transpose(slide_left(transpose(table)))
 
 
 def slide_down(table):
