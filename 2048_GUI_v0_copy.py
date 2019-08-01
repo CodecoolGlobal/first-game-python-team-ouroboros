@@ -11,18 +11,17 @@ def starting_table():
     table = [[0] * 4 for row in range(4)]
     starting_coordinates_1 = starting_coordinates_2 = None
     while starting_coordinates_1 == starting_coordinates_2:
-        starting_coordinates_1 = [randint(0,3), randint(0,3)]
-        starting_coordinates_2 = [randint(0,3), randint(0,3)]
-    two_or_four = randint(0,9)
-    if two_or_four < 9:
-        table[starting_coordinates_1[0]][starting_coordinates_1[1]] = 2 
+        starting_coordinates_1 = [randint(0, 3), randint(0, 3)]
+        starting_coordinates_2 = [randint(0, 3), randint(0, 3)]
+    two_or_four = (randint(0, 9), randint(0, 9))  # 90% nr 2, 10% nr 4 inserted
+    if two_or_four[0] < 9:
+        table[starting_coordinates_1[0]][starting_coordinates_1[1]] = 2
     else:
         table[starting_coordinates_1[0]][starting_coordinates_1[1]] = 4
-    two_or_four = randint(0,9)
-    if two_or_four < 9:
+    if two_or_four[1] < 9:
         table[starting_coordinates_2[0]][starting_coordinates_2[1]] = 2
     else:
-        table[starting_coordinates_2[0]][starting_coordinates_2[1]] = 4   
+        table[starting_coordinates_2[0]][starting_coordinates_2[1]] = 4
     return table
 
 
@@ -37,7 +36,8 @@ def zero_search(table):
 
 def status_check(table):
     copy_table = [sorted(row, reverse=True) for row in table]
-    if max(max(copy_table)) < 16:
+    WINNING_CONDITION = 32
+    if max(max(copy_table)) < WINNING_CONDITION:
         if zero_search(table) != []:
             status = "New round"
         elif addable(table):
@@ -53,118 +53,92 @@ def addable(table):
     equals = []
     for i in range(len(table)):
         for j in range(4):
-            if i != 3 and j != 3:     
+            if i != 3 and j != 3:
                 if table[i][j] == table[i][j+1] or table[i][j] == table[i+1][j]:
-                    equals.append([i,j])
+                    equals.append([i, j])
             if i == 3 and j != 3:
                 if table[i][j] == table[i][j+1]:
-                    equals.append([i,j])
+                    equals.append([i, j])
             if i != 3 and j == 3:
                 if table[i][j] == table[i+1][j]:
-                    equals.append([i,j])
+                    equals.append([i, j])
     return True if equals != [] else False
 
 
-def remove_all(what, from_where):
-    for nested_list in from_where:
-        while what in nested_list:
-            nested_list.remove(what)
+def remove_zeros(table):
+    for nested_list in table:
+        while 0 in nested_list:
+            nested_list.remove(0)
 
 
 def slide_right(table):
-    remove_all(0,table)
+    remove_zeros(table)
+    global score
     for rows in table:
         if len(rows) == 2:
             if rows[-1] == rows[-2]:
                 rows[-1] += rows[-2]
                 del rows[-2]
+                score += rows[-1]
         elif len(rows) == 3:
             if rows[-1] == rows[-2]:
                 rows[-1] += rows[-2]
                 del rows[-2]
+                score += rows[-1]
             elif rows[-2] == rows[-3]:
                 rows[-2] += rows[-3]
-                del rows[-3]  
+                del rows[-3]
+                score += rows[-2]
         elif len(rows) == 4:
-                if rows[-1] == rows[-2] and rows[-3] == rows[-4]:
-                    rows[-1] += rows[-2]
-                    rows[-2] = rows[-3] + rows[-4]
-                    del rows[-4]
-                    del rows[-3]
-                elif rows[-1] == rows[-2]:
-                    rows[-1] += rows[-2]
-                    del rows[-2]
-                elif rows[-2] == rows[-3]:
-                    rows[-2] += rows[-3]
-                    del rows[-3]  
-                elif rows[-3] == rows[-4]:
-                    rows[-3] += rows[-4]
-                    del rows[-4]
+            if rows[-1] == rows[-2] and rows[-3] == rows[-4]:
+                rows[-1] += rows[-2]
+                rows[-2] = rows[-3] + rows[-4]
+                del rows[-4]
+                del rows[-3]
+                score += rows[-1] + rows[-2]
+            elif rows[-1] == rows[-2]:
+                rows[-1] += rows[-2]
+                del rows[-2]
+                score += rows[-1]
+            elif rows[-2] == rows[-3]:
+                rows[-2] += rows[-3]
+                del rows[-3]
+                score += rows[-2]
+            elif rows[-3] == rows[-4]:
+                rows[-3] += rows[-4]
+                del rows[-4]
+                score += rows[-3]
     for i in range(4):
         while len(table[i]) != 4:
-            table[i].insert(0,0)    
+            table[i].insert(0, 0)
     return table
 
 
 def slide_left(table):
-    remove_all(0,table)
-    for i in range(4):
-        if len(table[i]) == 2:
-            if table[i][0] == table[i][1]:
-                table[i][0] += table[i][1]
-                table[i].pop(1)
-        elif len(table[i]) == 3:
-            if table[i][0] == table[i][1]:
-                table[i][0] += table[i][1]
-                table[i].pop(1)
-            elif table[i][1] == table[i][2]:
-                table[i][1] += table[i][2]
-                table[i].pop(2)
-        elif len(table[i]) == 4:
-            if table[i][0] == table[i][1] and table[i][2] == table[i][3]:
-                table[i][0] += table[i][1]
-                table[i][2] += table[i][3]
-                table[i].pop(3)
-                table[i].pop(1)
-            elif table[i][0] == table[i][1]:
-                table[i][0] += table[i][1]
-                table[i].pop(1)
-            elif table[i][1] == table[i][2]:
-                table[i][1] += table[i][2]
-                table[i].pop(2)
-            elif table[i][2] == table[i][3]:
-                table[i][2] += table[i][3]
-                table[i].pop(3)
-    for i in range(4):
-        while len(table[i]) != 4:
-            table[i].append(0)
-    return table
+    return reverse_rows(slide_right(reverse_rows(table)))
 
 
-def rotate(table):
+def transpose(table):
     return [list(row) for row in zip(*table)]
 
 
+def reverse_rows(table):
+    return [list(reversed(row)) for row in table]
+
+
 def slide_up(table):
-    table = rotate(table)
-    slide_left(table)
-    table = rotate(table)
-    print(table)
-    return table
+    return transpose(slide_left(transpose(table)))
 
 
 def slide_down(table):
-    table = rotate(table)
-    slide_right(table)
-    table = rotate(table)
-    return table
+    return transpose(slide_right(transpose(table)))
 
 
 def insert_number(table):
     zero_coordinates = zero_search(table)
-    if zero_coordinates != []: 
+    if zero_coordinates != []:
         number_of_zeroes = len(zero_coordinates)
-        random_index = randint(0,number_of_zeroes-1)
+        random_index = randint(0, number_of_zeroes-1)
         i_j_coordinates = zero_coordinates[random_index]
         i_coordinate = i_j_coordinates[0]
         j_coordinate = i_j_coordinates[1]
@@ -305,7 +279,7 @@ def restart_game():
 
 table = starting_table()
 status = "New round"
-
+score = 0
 
 # ----------   GUI   ----------
 
