@@ -1,6 +1,5 @@
 from tkinter import *
 from tkinter import ttk
-from tkinter import messagebox
 from random import randint
 from copy import deepcopy
 import sys
@@ -36,7 +35,7 @@ def zero_search(table):
 
 def status_check(table):
     copy_table = [sorted(row, reverse=True) for row in table]
-    WINNING_CONDITION = 16
+    WINNING_CONDITION = 128
     if max(max(copy_table)) < WINNING_CONDITION:
         if zero_search(table) != []:
             status = "New round"
@@ -214,7 +213,7 @@ def update_GUI_cells():
     else:
         cell_16.set('  ')
     cell_17.set(digital_timer)
-    
+    cell_18.set(score)
 
 
 def callback(event):
@@ -306,11 +305,13 @@ def timer(time):
     count()
 
 
-def start_timer(time): 
-    global running 
-    running=True
+def start_timer(time):
+    global running
+    running = True
     timer(time)
 
+
+# initialize starting variables
 
 table = starting_table()
 status = "New round"
@@ -348,6 +349,7 @@ cell_14 = StringVar()
 cell_15 = StringVar()
 cell_16 = StringVar()
 cell_17 = StringVar()
+cell_18 = StringVar()
 
 update_GUI_cells()
 
@@ -359,21 +361,23 @@ gui_style.configure('TButton', foreground='#334353')
 gui_style.configure('outer.TFrame', background='#363740')
 gui_style.configure('cell.TFrame', background='#351f36', relief='raised')
 gui_style.configure('TLabel', background='#351f36', foreground='#ccc497', font=("Arial", 35))
-
+gui_style.configure('TFrame', background='#363740')
+gui_style.configure('title.TLabel', background='#363740', foreground='#ccc497', font=("Arial", 15))
 
 # main frame:
 
 mainframe = ttk.Frame(root, width=1500, height=600, padding=10, style='outer.TFrame')
 mainframe.grid()
 
-
 # game board frame inside main frame:
 
-time_board = ttk.Frame(mainframe, width=120, height=50, relief='raised', style='TLabel')
-time_board.grid(row=0, column=0)
 game_board = ttk.Frame(mainframe, width=1200, height=600, relief='raised')
 game_board.grid(row=1, column=0)
 
+# display board above game board:
+
+display_board = ttk.Frame(mainframe, width=120, height=50, padding=(0,5,0,15), style='outer.TFrame')
+display_board.grid(row=0, column=0)
 
 # game board individual frames:
 
@@ -441,6 +445,27 @@ frame_16 = ttk.Frame(game_board, style='cell.TFrame')
 frame_16.grid(row=3, column=3)
 frame_16.configure(height=100, width=100, padding=50)
 
+frame_17 = ttk.Frame(display_board, style='TFrame')
+frame_17.grid(row=0, column=1)
+frame_17.configure(height=50, width=120)
+
+frame_18 = ttk.Frame(display_board, style='TFrame')
+frame_18.grid(row=0, column=0)
+frame_18.configure(height=50, width=120)
+
+frame_19 = ttk.Frame(frame_17, style='cell.TFrame')
+frame_19.grid(row=1, column=0)
+frame_19.configure(height=50, width=120)
+
+frame_20 = ttk.Frame(frame_18, style='cell.TFrame')
+frame_20.grid(row=1, column=0)
+frame_20.configure(height=50, width=120)
+
+frame_21 = ttk.Frame(frame_17, style='TFrame')
+frame_21.grid(row=0, column=0)
+
+frame_22 = ttk.Frame(frame_18, style='test.TFrame')
+frame_22.grid(row=0, column=0)
 
 # labels for frames on game board:
 
@@ -493,12 +518,21 @@ label_frame_16 = ttk.Label(frame_16, textvariable=cell_16, style='TLabel')
 label_frame_16.place(anchor="center")
 
 #label for timer frame
-label_frame_17 = ttk.Label(time_board, textvariable=cell_17, style='TLabel')
-label_frame_17.place(x=60, y=25, anchor="center")
-label_frame_17.config(font=("Arial", 30))
+label_frame_21 = ttk.Label(frame_21, text="TIME", style='title.TLabel')
+label_frame_21.grid()
+label_frame_19 = ttk.Label(frame_19, textvariable=cell_17, style='TLabel')
+label_frame_19.place(x=60, y=25, anchor="center")
+label_frame_19.config(font=("Arial", 30))
+
+#label for score frame
+label_frame_22 = ttk.Label(frame_22, text="SCORE", style='title.TLabel')
+label_frame_22.grid()
+label_frame_20 = ttk.Label(frame_20, textvariable=cell_18, style='TLabel')
+label_frame_20.place(x=60, y=25, anchor="center")
+label_frame_20.config(font=("Arial", 30))
 
 #stopwatch starter
-start_timer(label_frame_17)
+start_timer(label_frame_19)
 
 # event handling:
 
