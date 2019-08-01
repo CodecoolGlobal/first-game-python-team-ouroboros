@@ -36,7 +36,7 @@ def zero_search(table):
 
 def status_check(table):
     copy_table = [sorted(row, reverse=True) for row in table]
-    WINNING_CONDITION = 32
+    WINNING_CONDITION = 16
     if max(max(copy_table)) < WINNING_CONDITION:
         if zero_search(table) != []:
             status = "New round"
@@ -213,6 +213,8 @@ def update_GUI_cells():
         cell_16.set(table[3][3])
     else:
         cell_16.set('  ')
+    cell_17.set(digital_timer)
+    
 
 
 def callback(event):
@@ -277,9 +279,45 @@ def restart_game():
     os.execl(python, python, * sys.argv)
 
 
+def timer(time):
+    def count(): 
+        if (running == True) and (status_check(table) == "New round"): 
+            global counter
+            global digital_timer 
+            display=str(time) 
+            time.config(text=display)   
+  
+            time.after(1000, count)  
+            counter += 1
+            if counter < 10: 
+                digital_timer = f'00:0{counter % 60}'
+            else:
+                if (counter // 60 < 10) and (counter % 60 < 10): 
+                    digital_timer = f'0{counter // 60}:0{counter % 60}'
+                elif (counter // 60 < 10) and (counter % 60 >= 10):               
+                    digital_timer = f'0{counter // 60}:{counter % 60}'
+                else:
+                    if counter % 60 < 10:
+                        digital_timer = f'{counter // 60}:0{counter % 60}'
+                    else:
+                        digital_timer = f'{counter // 60}:{counter % 60}'
+        
+            update_GUI_cells()
+    count()
+
+
+def start_timer(time): 
+    global running 
+    running=True
+    timer(time)
+
+
 table = starting_table()
 status = "New round"
 score = 0
+counter = -1
+running = False
+digital_timer = '00:00'
 
 # ----------   GUI   ----------
 
@@ -309,6 +347,7 @@ cell_13 = StringVar()
 cell_14 = StringVar()
 cell_15 = StringVar()
 cell_16 = StringVar()
+cell_17 = StringVar()
 
 update_GUI_cells()
 
@@ -330,8 +369,10 @@ mainframe.grid()
 
 # game board frame inside main frame:
 
+time_board = ttk.Frame(mainframe, width=120, height=50, relief='raised', style='TLabel')
+time_board.grid(row=0, column=0)
 game_board = ttk.Frame(mainframe, width=1200, height=600, relief='raised')
-game_board.grid(row=0, column=0)
+game_board.grid(row=1, column=0)
 
 
 # game board individual frames:
@@ -450,6 +491,14 @@ label_frame_15.place(anchor="center")
 
 label_frame_16 = ttk.Label(frame_16, textvariable=cell_16, style='TLabel')
 label_frame_16.place(anchor="center")
+
+#label for timer frame
+label_frame_17 = ttk.Label(time_board, textvariable=cell_17, style='TLabel')
+label_frame_17.place(x=60, y=25, anchor="center")
+label_frame_17.config(font=("Arial", 30))
+
+#stopwatch starter
+start_timer(label_frame_17)
 
 # event handling:
 
