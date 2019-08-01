@@ -1,5 +1,6 @@
 from random import randint
 import copy
+from termcolor import colored, cprint
 
 
 def starting_table():
@@ -31,7 +32,7 @@ def zero_search(table):
 
 def status_check(table):
     copy_table = [sorted(row, reverse=True) for row in table]
-    WINNING_CONDITION = 2048
+    WINNING_CONDITION = 16
     if max(max(copy_table)) < WINNING_CONDITION:
         if zero_search(table) != []:
             status = "New round"
@@ -123,7 +124,7 @@ def reverse_rows(table):
 
 
 def slide_up(table):
-    return transpose(reverse_rows(slide_right(reverse_rows(transpose(table)))))
+    return transpose(slide_left(transpose(table)))
 
 
 def slide_down(table):
@@ -150,9 +151,9 @@ def table_print():
             if table_to_print[i][j] == 0:
                 table_to_print[i][j] = ""
     print()
-    print("THE 2048 GAME".center(33))
+    cprint(colored(("THE 2048 GAME".center(33)), "cyan", "on_red", ["bold"]))
     print()
-    print(f"Your score: {score}")
+    cprint(colored(f"Score: {score}".ljust(16) + f"High score: {high_score}".rjust(17), "cyan", None, ["bold"]))
     print("-" * 33)
     for i in range(4):
         print("|" + ("".center(7) + "|") * 4)
@@ -161,9 +162,9 @@ def table_print():
         print("|" + ("".center(7) + "|") * 4)
         print("-" * 33)
     print()
-    print("""moves: 'w'= up / 's'= down /
+    cprint(colored("""moves: 'w'= up / 's'= down /
        'a'=left / 'd'=right
-       or enter 'x' to exit """)
+       or enter 'x' to exit """, "cyan"))
 
 
 def user_input():
@@ -184,16 +185,30 @@ def user_input():
 
 
 def new_game(start):
-    if input("New game? (y/n)") == "y":
+    if input("\nNew game? (y/n)") == "y":
         start = "New game"
     else:
         start = "End game"
     return start
 
 
+def write_high_score(score, high_score):
+    if score > high_score:
+        with open("high_score.txt", "w", newline="") as f:
+            high_score = score
+            f.write(str(high_score))
+
+
+def read_high_score():
+    with open("high_score.txt", "r", newline="") as f:
+        high_score = int(f.read())
+    return(high_score)
+
+
 start = "New game"
 while start == "New game":
     score = 0
+    high_score = read_high_score()
     status = "New round"
     table = starting_table()
     table_print()
@@ -220,11 +235,14 @@ while start == "New game":
             status = status_check(table)
         table_print()
     else:
+        write_high_score(score, high_score)
         if status == "End game":
-            print("No moves left! Game Over!")
+            print()
+            cprint(colored("No moves left! Game Over!", "red", "on_yellow", ["bold"]))
             start = new_game(start)
         elif status == "You win":
-            print("Congrats! You win!")
+            print()
+            cprint(colored(("Congrats! You win!"), "red", "on_green", ["bold"]))
             start = new_game(start)
 else:
     exit()
