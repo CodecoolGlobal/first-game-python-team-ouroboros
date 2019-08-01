@@ -1,4 +1,4 @@
-from tkinter import *
+import tkinter as tk
 from tkinter import ttk
 from random import randint
 from copy import deepcopy
@@ -248,20 +248,21 @@ def callback(event):
 
 
 def popupmsg(msg):
-    popup_root = Tk()
+    popup_root = tk.Tk()
     popup_root.wm_title('2048 message')
     popup_root.resizable(False, False)
-    popup_mainframe = Frame(popup_root, bg='#351f36')
+    popup_mainframe = tk.Frame(popup_root, bg='#351f36')
     popup_mainframe.grid()
-    popup_row_1 = Frame(popup_mainframe)
+    popup_row_1 = tk.Frame(popup_mainframe)
     popup_row_1.grid(row=0, column=0)
-    popup_row_2 = Frame(popup_mainframe, bg='#351f36')
+    popup_row_2 = tk.Frame(popup_mainframe, bg='#351f36')
     popup_row_2.grid(row=1, column=0)
     label = ttk.Label(popup_row_1, text=msg, padding=20, background='#351f36', foreground='#ccc497', font=("Arial", 35))
     label.grid()
-    B1 = Button(popup_row_2, text='Restart', command=restart_game, bg='#363740', fg='#ccc497', font=("Arial", 15))
+    B1 = tk.Button(popup_row_2, text='Restart', command=restart_game, bg='#363740', fg='#ccc497', font=("Arial", 15))
     B1.grid(row=0, column=1)
-    B2 = Button(popup_row_2, text='Quit', command=combine_funcs(root.destroy, popup_root.destroy), bg='#363740', fg='#ccc497', font=("Arial", 15))
+    B2 = tk.Button(popup_row_2, text='Quit', command=combine_funcs(root.destroy, popup_root.destroy), bg='#363740',
+                   fg='#ccc497', font=("Arial", 15))
     B2.grid(row=0, column=2)
     popup_root.mainloop()
 
@@ -279,28 +280,28 @@ def restart_game():
 
 
 def timer(time):
-    def count(): 
-        if (running == True) and (status_check(table) == "New round"): 
+    def count():
+        if (running is True) and (status_check(table) == "New round"):
             global counter
-            global digital_timer 
-            display=str(time) 
-            time.config(text=display)   
-  
-            time.after(1000, count)  
+            global digital_timer
+            display = str(time)
+            time.config(text=display)
+
+            time.after(1000, count)
             counter += 1
-            if counter < 10: 
+            if counter < 10:
                 digital_timer = f'00:0{counter % 60}'
             else:
-                if (counter // 60 < 10) and (counter % 60 < 10): 
+                if (counter // 60 < 10) and (counter % 60 < 10):
                     digital_timer = f'0{counter // 60}:0{counter % 60}'
-                elif (counter // 60 < 10) and (counter % 60 >= 10):               
+                elif (counter // 60 < 10) and (counter % 60 >= 10):
                     digital_timer = f'0{counter // 60}:{counter % 60}'
                 else:
                     if counter % 60 < 10:
                         digital_timer = f'{counter // 60}:0{counter % 60}'
                     else:
                         digital_timer = f'{counter // 60}:{counter % 60}'
-        
+
             update_GUI_cells()
     count()
 
@@ -325,31 +326,31 @@ digital_timer = '00:00'
 
 # initialize GUI:
 
-root = Tk()
+root = tk.Tk()
 root.title('2048')
 root.resizable(False, False)
 
 
 # initialize GUI variables:
 
-cell_1 = StringVar()
-cell_2 = StringVar()
-cell_3 = StringVar()
-cell_4 = StringVar()
-cell_5 = StringVar()
-cell_6 = StringVar()
-cell_7 = StringVar()
-cell_8 = StringVar()
-cell_9 = StringVar()
-cell_10 = StringVar()
-cell_11 = StringVar()
-cell_12 = StringVar()
-cell_13 = StringVar()
-cell_14 = StringVar()
-cell_15 = StringVar()
-cell_16 = StringVar()
-cell_17 = StringVar()
-cell_18 = StringVar()
+cell_1 = tk.StringVar()
+cell_2 = tk.StringVar()
+cell_3 = tk.StringVar()
+cell_4 = tk.StringVar()
+cell_5 = tk.StringVar()
+cell_6 = tk.StringVar()
+cell_7 = tk.StringVar()
+cell_8 = tk.StringVar()
+cell_9 = tk.StringVar()
+cell_10 = tk.StringVar()
+cell_11 = tk.StringVar()
+cell_12 = tk.StringVar()
+cell_13 = tk.StringVar()
+cell_14 = tk.StringVar()
+cell_15 = tk.StringVar()
+cell_16 = tk.StringVar()
+cell_17 = tk.StringVar()
+cell_18 = tk.StringVar()
 
 update_GUI_cells()
 
@@ -376,7 +377,7 @@ game_board.grid(row=1, column=0)
 
 # display board above game board:
 
-display_board = ttk.Frame(mainframe, width=120, height=50, padding=(0,5,0,15), style='outer.TFrame')
+display_board = ttk.Frame(mainframe, width=120, height=50, padding=(0, 5, 0, 15), style='outer.TFrame')
 display_board.grid(row=0, column=0)
 
 # game board individual frames:
@@ -517,21 +518,24 @@ label_frame_15.place(anchor="center")
 label_frame_16 = ttk.Label(frame_16, textvariable=cell_16, style='TLabel')
 label_frame_16.place(anchor="center")
 
-#label for timer frame
+# labels for timer frame:
+
 label_frame_21 = ttk.Label(frame_21, text="TIME", style='title.TLabel')
 label_frame_21.grid()
 label_frame_19 = ttk.Label(frame_19, textvariable=cell_17, style='TLabel')
 label_frame_19.place(x=60, y=25, anchor="center")
 label_frame_19.config(font=("Arial", 30))
 
-#label for score frame
+# labels for score frame:
+
 label_frame_22 = ttk.Label(frame_22, text="SCORE", style='title.TLabel')
 label_frame_22.grid()
 label_frame_20 = ttk.Label(frame_20, textvariable=cell_18, style='TLabel')
 label_frame_20.place(x=60, y=25, anchor="center")
 label_frame_20.config(font=("Arial", 30))
 
-#stopwatch starter
+# stopwatch starter:
+
 start_timer(label_frame_19)
 
 # event handling:
